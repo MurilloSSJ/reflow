@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-EXPOSE 3010
+EXPOSE 3011

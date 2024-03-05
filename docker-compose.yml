@@ -1,4 +1,6 @@
 version: '3'
+volumes:
+  postgres-db-volume:
 services:
   redis:
     image: redis:latest
@@ -16,10 +18,36 @@ services:
   worker-api:
     container_name: worker-api
     build: worker_control_api
-    command: uvicorn worker_control_api.src.main:app --reload --host 0.0.0.0 --port 3002
+    command: uvicorn src.main:app --reload --host 0.0.0.0 --port 3002
     volumes:
-      - .:/usr/src
+      - ./worker_control_api:/usr/src
     ports:
-      - 3002:3002
+      - 3010:3010
     env_file:
       - .env
+  
+  reflow-api:
+    container_name: reflow-api
+    build: reflow_api
+    command: uvicorn src.main:app --reload --host 0.0.0.0 --port 3001
+    volumes:
+      - ./reflow_api:/usr/src
+    ports:
+      - 3011:3011
+    env_file:
+      - .env
+  
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: reflow
+      POSTGRES_PASSWORD: reflow
+      POSTGRES_DB: reflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "reflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: always

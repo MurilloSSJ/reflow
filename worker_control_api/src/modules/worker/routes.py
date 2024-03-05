@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
-from worker_control_api.src.modules.worker.dto import WorkerCreate
+from src.modules.worker.dto import WorkerCreate
 
 router = APIRouter()
 
