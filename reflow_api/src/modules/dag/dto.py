@@ -1,9 +1,8 @@
 from pydantic import BaseModel
 from typing import Union, List, Optional
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
-from src.generics.dto.interval import PydanticInterval
 
 
 class DefaultViewEnum(str, Enum):
@@ -24,7 +23,7 @@ class CreateDagDTO(BaseModel):
     owners: List[str]
     description: str
     default_view: DefaultViewEnum
-    schedule_interval: Optional[PydanticInterval]
+    schedule_interval: Optional[timedelta]
     timetable_description: Union[str, None] = None
     tags: List[str]
     max_active_tasks: Union[int, None] = None
@@ -32,3 +31,8 @@ class CreateDagDTO(BaseModel):
     has_task_concurrency_limits: bool
     has_import_errors: bool = False
     next_dagrun: datetime
+
+
+class DagError(BaseModel):
+    error_log: str
+    absolute_path: str
