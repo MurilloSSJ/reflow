@@ -16,7 +16,6 @@ type Dag struct {
 	IsPaused                 bool                   `json:"is_paused"`
 	IsActive                 bool                   `json:"is_active"`
 	Description              string                 `json:"description"`
-	DefaultView              string                 `json:"default_view"`
 	TimetableDescription     string                 `json:"timetable_description"`
 	Tags                     []string               `json:"tags"`
 	MaxActiveTasks           uint8                  `json:"max_active_tasks"`
@@ -51,7 +50,31 @@ func NewDagByString(input string) *Dag {
 			dag.ScheduleInterval = value
 		case "owners":
 			dag.Owners = strings.Split(value, " ")
+		case "is_paused":
+			dag.IsPaused = value
+		
+		case "is_active":
+			dag.IsActive = value
+		
+		case "description":
+			dag.Description = value
+		
+		case "timetable_description":
+			dag.TimetableDescription = value
+		
+		case "tags":
+			dag.Tags = strings.Split(value, " ")
+		
+		case "max_active_tasks":
+			dag.MaxActiveTasks = value
+		
+		case "max_active_runs":
+			dag.MaxActiveRuns = value
+		
+		case "has_task_concurrency_limits":
+			dag.HasTaskConcurrencyLimits = value
 		}
+
 
 	}
 }
