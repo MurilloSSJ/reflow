@@ -1,4 +1,4 @@
-from src.modules.dag.model import DagModel
+from models.dag import DagModel
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import select
 

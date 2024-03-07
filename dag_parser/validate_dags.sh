@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DAG_DIRECTORY="/home/murillo/Documentos/projetos/reflow/dags"
+DAG_DIRECTORY="/opt/reflow/dags"
 
 get_all_dags() {
     local dir="$1"
@@ -28,7 +28,8 @@ debugging_all_dags() {
         if [[ -n "$error_output" ]]; then
             echo "Error in $dag_file"
             data=$(jq -n --arg error_output "$error_output" --arg dag_file "$dag_file" '{ "error_log": $error_output, "absolute_path": $dag_file }')
-            response=$(curl -s -X PATCH -H "Content-Type: application/json" -d "$data" http://localhost:3011/api/dags/set-error)
+            response=$(curl -s -X PATCH -H "Content-Type: application/json" -d "$data" http://reflow-api:3011/api/dags/set-error)
+            echo "Response: $response"
         fi
     done
 }

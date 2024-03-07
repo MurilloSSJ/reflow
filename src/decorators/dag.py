@@ -1,6 +1,3 @@
-from datetime import datetime
-
-
 class DAG:
     def __init__(
         self,
