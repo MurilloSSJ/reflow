@@ -1,2 +1,5 @@
 fastapi[all]
 pydantic
+sqlalchemy
+psycopg2
+requests

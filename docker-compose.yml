@@ -1,6 +1,10 @@
 # REFLOW_PROJ_DIR             - Base path to which all the files will be volumed.
 
 version: '3'
+networks:
+  reflow:
+    driver: bridge
+
 volumes:
   postgres-db-volume:
 services:
@@ -26,19 +30,10 @@ services:
       REDIS_HOSTS: local:redis:6379
     restart: always
 
-  worker-api:
-    container_name: worker-api
-    build: worker_control_api
-    command: uvicorn src.main:app --reload --host 0.0.0.0 --port 3002
-    volumes:
-      - ./worker_control_api:/usr/src
-    ports:
-      - 3010:3010
-    env_file:
-      - .env
-
   reflow-api:
     container_name: reflow-api
+    networks:
+      - reflow
     build: reflow_api
     command: uvicorn src.main:app --reload --host 0.0.0.0 --port 3011
     volumes:
@@ -50,6 +45,9 @@ services:
 
   postgres:
     image: postgres:latest
+    container_name: reflow-postgres
+    networks:
+      - reflow
     environment:
       POSTGRES_USER: reflow
       POSTGRES_PASSWORD: reflow
@@ -62,9 +60,35 @@ services:
       retries: 5
       start_period: 5s
     restart: always
-
-  dag_parser:
-    build: ./dag_parser
-    container_name: dag-parser
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:20.0.2
+    container_name: keycloak
+    environment:
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 7080
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://reflow-postgres:5432/keycloak?createDatabaseIfNotExist=true&characterEncoding=UTF-8
+      KC_DB_USERNAME: reflow
+      KC_DB_PASSWORD: reflow
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+      KC_LOG_LEVEL: info
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:7080/health/ready" ]
+      interval: 15s
+      timeout: 2s
+      retries: 15
+    command:
+      [ "start-dev", "--http-port 7080", "--https-port 7443", "--import-realm" ]
     volumes:
-      - ${REFLOW_PROJ_DIR:-.}/dags:/opt/reflow/dags
+      - ../keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+    ports:
+      - 7080:7080
+      - 7443:7443
+    networks:
+      - reflow
+    depends_on:
+      - postgres

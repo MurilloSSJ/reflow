@@ -6,31 +6,21 @@ from enum import Enum
 
 
 class DefaultViewEnum(str, Enum):
-    grid = "grid"
-    graph = "graph"
-    duration = "duration"
-    gantt = "gantt"
-    landing_times = "landing_times"
+    left = "left"
+    right = "right"
+    up = "up"
+    bottom = "bottom"
 
 
 class CreateDagDTO(BaseModel):
-    dag_id: uuid.UUID
+    dag_name: str
     is_paused: bool = True
     is_active: bool = False
-    last_parsed_time: datetime = datetime.now()
-    scheduler_lock: bool = False
+    start_date: Optional[datetime]
     fileloc: str
-    owners: List[str]
-    description: str
-    default_view: DefaultViewEnum
     schedule_interval: Optional[timedelta]
-    timetable_description: Union[str, None] = None
-    tags: List[str]
-    max_active_tasks: Union[int, None] = None
-    max_active_runs: Union[int, None] = None
-    has_task_concurrency_limits: bool
     has_import_errors: bool = False
-    next_dagrun: datetime
+    next_dagrun: Optional[datetime]
 
 
 class DagError(BaseModel):
